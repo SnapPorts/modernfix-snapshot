@@ -9,13 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ImposterProtoChunk.class)
 public abstract class ImposterProtoChunkMixin extends ChunkAccessMixin {
-    /**
-     * @author embeddedt
-     * @reason ImposterProtoChunks allocate their own LevelChunkSection objects etc. which wastes quite
-     * a bit of memory
-     */
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void replaceDuplicateObjects(LevelChunk wrapped, boolean allowWrites, CallbackInfo ci) {
+    private void replaceDuplicateObjects(LevelChunk wrapped, CallbackInfo ci) {
         this.sections = wrapped.getSections();
         this.skyLightSources = wrapped.getSkyLightSources();
     }

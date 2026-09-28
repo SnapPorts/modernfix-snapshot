@@ -13,7 +13,6 @@ import net.minecraft.client.resources.model.cuboid.ItemModelGenerator;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelLoader;
 import org.embeddedt.modernfix.annotation.ClientOnlyMixin;
 import org.embeddedt.modernfix.dynresources.BlockStateModelMap;
 import org.embeddedt.modernfix.dynresources.DynamicModelSystem;
@@ -49,7 +48,7 @@ public class MixinModelManager {
      * @reason Stop all models from being loaded at startup by the model resolution logic.
      */
     @Redirect(
-            method = "discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;Lnet/neoforged/neoforge/client/model/standalone/StandaloneModelLoader$LoadedModels;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;",
+            method = "discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;",
             at = @At(value = "INVOKE", target = "Ljava/util/Collection;forEach(Ljava/util/function/Consumer;)V"))
     private static <T> void skipAddingRoot(Collection<T> instance, Consumer<T> consumer) {
     }
@@ -60,15 +59,14 @@ public class MixinModelManager {
      * a conflict with Sodium.
      */
     @Redirect(
-            method = "discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;Lnet/neoforged/neoforge/client/model/standalone/StandaloneModelLoader$LoadedModels;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;",
+            method = "discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelDiscovery;resolve()Ljava/util/Map;")
     )
     private static Map<Identifier, ResolvedModel> useDynamicResolverMap(
             ModelDiscovery discovery,
             Map<Identifier, UnbakedModel> allModels,
             BlockStateModelLoader.LoadedModels blockStateModels,
-            ClientItemInfoLoader.LoadedClientInfos itemInfos,
-            StandaloneModelLoader.LoadedModels standaloneModels
+            ClientItemInfoLoader.LoadedClientInfos itemInfos
     ) {
         UnbakedModel generatedItemModel;
         var generatedItemWrapper = ((ModelDiscoveryAccessor) discovery).mfix$getModelWrappers().get(ItemModelGenerator.GENERATED_ITEM_MODEL_ID);
@@ -77,7 +75,7 @@ public class MixinModelManager {
         } else {
             generatedItemModel = new ItemModelGenerator();
         }
-        return new DynamicModelSystem.DynamicResolver(allModels, blockStateModels, itemInfos, standaloneModels, generatedItemModel).resolvedModelsMap();
+        return new DynamicModelSystem.DynamicResolver(allModels, blockStateModels, itemInfos, generatedItemModel).resolvedModelsMap();
     }
 
     /**

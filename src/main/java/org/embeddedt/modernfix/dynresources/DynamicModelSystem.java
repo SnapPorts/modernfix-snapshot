@@ -25,8 +25,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.UnbakedModelParser;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelLoader;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
 import org.embeddedt.modernfix.ModernFix;
 import org.embeddedt.modernfix.common.mixin.perf.dynamic_resources.BlockStateDefinitionsAccessor;
 import org.embeddedt.modernfix.common.mixin.perf.dynamic_resources.IdMapperAccessor;
@@ -90,7 +89,7 @@ public class DynamicModelSystem {
         return createCachedResourceBackedMap(resourceMap, MODEL_LISTER, "unbaked model", (id, resource) -> {
             Objects.requireNonNull(resource, "unbaked model not present");
             try (Reader reader = resource.openAsReader()) {
-                return UnbakedModelParser.parse(reader);
+                return CuboidModel.fromStream(reader);
             }
         });
     }
@@ -132,7 +131,7 @@ public class DynamicModelSystem {
         return new BlockStateModelLoader.LoadedModels(Maps.asMap(blockStateSet, state -> {
             var identifier = staticIdentifiers.get(state);
             if (identifier == null) {
-                identifier = state.getBlock().builtInRegistryHolder().getKey().identifier();
+                identifier = state.getBlock().builtInRegistryHolder().key().identifier();
             }
             var loadedModels = blockStateDefinitions.get(identifier);
             if (loadedModels != null) {
@@ -155,7 +154,6 @@ public class DynamicModelSystem {
     public record DynamicResolver(Map<Identifier, UnbakedModel> inputModels,
                                           BlockStateModelLoader.LoadedModels loadedModels,
                                           ClientItemInfoLoader.LoadedClientInfos loadedClientInfos,
-                                          StandaloneModelLoader.LoadedModels standaloneModels,
                                           UnbakedModel generatedItemModel) {
 
         private ResolvedModel resolveModel(Identifier id) {

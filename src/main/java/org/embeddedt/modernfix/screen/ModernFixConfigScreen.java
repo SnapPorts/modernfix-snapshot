@@ -26,7 +26,7 @@ public class ModernFixConfigScreen extends Screen {
         this.optionList.setScrollAmount(lastScrollAmount);
         this.addWidget(this.optionList);
         this.wikiButton = new Button.Builder(Component.translatable("modernfix.config.wiki"), (arg) -> {
-            Util.getPlatform().openUri("https://github.com/embeddedt/ModernFix/wiki/Summary-of-Patches");
+            net.minecraft.client.gui.screens.ConfirmLinkScreen.confirmLinkNow(this, java.net.URI.create("https://github.com/embeddedt/ModernFix/wiki/Summary-of-Patches"));
         }).pos(this.width / 2 - 155, this.height - 29).size(150, 20).build();
         this.doneButton = new Button.Builder(CommonComponents.GUI_DONE, (arg) -> {
             this.onClose();
@@ -37,7 +37,7 @@ public class ModernFixConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(lastScreen);
+        this.minecraft.gui.setScreen(lastScreen);
     }
 
     @Override

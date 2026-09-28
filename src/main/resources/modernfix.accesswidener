@@ -1,0 +1,43 @@
+accessWidener	v2	official
+accessible field net/minecraft/client/multiplayer/ClientChunkCache storage Lnet/minecraft/client/multiplayer/ClientChunkCache$Storage;
+accessible field net/minecraft/client/multiplayer/ClientChunkCache lightEngine Lnet/minecraft/world/level/lighting/LevelLightEngine;
+mutable field net/minecraft/client/multiplayer/ClientChunkCache lightEngine Lnet/minecraft/world/level/lighting/LevelLightEngine;
+accessible class net/minecraft/client/multiplayer/ClientChunkCache$Storage
+accessible field net/minecraft/client/multiplayer/ClientChunkCache$Storage chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
+accessible field net/minecraft/world/level/Level blockEntityTickers Ljava/util/List;
+accessible method net/minecraft/nbt/CompoundTag <init> (Ljava/util/Map;)V
+accessible class net/minecraft/world/level/biome/Climate$RTree
+accessible method net/minecraft/world/level/biome/Climate$RTree <init> (Lnet/minecraft/world/level/biome/Climate$RTree$Node;)V
+accessible class net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase$Cache
+accessible class net/minecraft/server/level/ServerChunkCache$MainThreadExecutor
+accessible field net/minecraft/world/level/block/state/BlockBehaviour properties Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+accessible class net/minecraft/client/renderer/texture/Stitcher$Holder
+accessible field net/minecraft/client/renderer/texture/Stitcher$Holder width I
+accessible field net/minecraft/client/renderer/texture/Stitcher$Holder height I
+accessible field net/minecraft/network/syncher/EntityDataAccessor id I
+mutable field net/minecraft/network/syncher/EntityDataAccessor id I
+accessible method net/minecraft/util/Util makeExecutor (Ljava/lang/String;)Lnet/minecraft/TracingExecutor;
+accessible field net/minecraft/server/level/ChunkMap updatingChunkMap Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;
+accessible field net/minecraft/server/level/ChunkMap visibleChunkMap Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;
+accessible field net/minecraft/server/level/ChunkMap pendingUnloads Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;
+accessible method net/minecraft/resources/ResourceKey <init> (Lnet/minecraft/resources/Identifier;Lnet/minecraft/resources/Identifier;)V
+accessible class net/minecraft/server/level/ChunkMap$DistanceManager
+accessible class net/minecraft/world/level/chunk/PalettedContainer$Data
+accessible field net/minecraft/server/MinecraftServer resources Lnet/minecraft/server/MinecraftServer$ReloadableResources;
+accessible class net/minecraft/server/MinecraftServer$ReloadableResources
+accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
+accessible field net/minecraft/client/KeyMapping ALL Ljava/util/Map;
+accessible method net/minecraft/world/level/block/state/StateDefinition appendPropertyCodec (Lcom/mojang/serialization/MapCodec;Ljava/util/function/Supplier;Ljava/lang/String;Lnet/minecraft/world/level/block/state/properties/Property;)Lcom/mojang/serialization/MapCodec;
+accessible class net/minecraft/client/multiplayer/SessionSearchTrees$Key
+accessible field net/minecraft/server/packs/resources/ProfiledReloadInstance$State preparationNanos Ljava/util/concurrent/atomic/AtomicLong;
+accessible field net/minecraft/server/packs/resources/ProfiledReloadInstance$State reloadNanos Ljava/util/concurrent/atomic/AtomicLong;
+accessible field net/minecraft/server/level/GenerationChunkHolder futures Ljava/util/concurrent/atomic/AtomicReferenceArray;
+accessible field net/minecraft/server/level/GenerationChunkHolder startedWork Ljava/util/concurrent/atomic/AtomicReference;
+accessible class net/minecraft/client/resources/model/ModelManager$ResolvedModels
+accessible method net/minecraft/client/resources/model/ModelManager$ResolvedModels <init> (Lnet/minecraft/client/resources/model/ResolvedModel;Ljava/util/Map;)V
+accessible class net/minecraft/client/resources/model/ModelDiscovery$ModelWrapper
+accessible method net/minecraft/client/resources/model/ModelDiscovery$ModelWrapper <init> (Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/resources/model/UnbakedModel;Z)V
+accessible method net/minecraft/client/resources/model/ModelDiscovery createAndQueueWrapper (Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/resources/model/UnbakedModel;)Lnet/minecraft/client/resources/model/ModelDiscovery$ModelWrapper;
+accessible class net/minecraft/client/resources/model/ClientItemInfoLoader$PendingLoad
+accessible method net/minecraft/client/resources/model/ClientItemInfoLoader$PendingLoad <init> (Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/renderer/item/ClientItem;)V
+accessible class net/minecraft/server/packs/FilePackResources$SharedZipFileAccess

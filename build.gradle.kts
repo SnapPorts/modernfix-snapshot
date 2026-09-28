@@ -1,65 +1,16 @@
 plugins {
-    id("net.neoforged.moddev") version("2.0.140")
-    id("me.modmuss50.mod-publish-plugin") version("2.1.1")
+    id("net.fabricmc.fabric-loom") version("1.15-SNAPSHOT")
 }
 
-val minecraft_version = rootProject.properties["minecraft_version"].toString()
+val minecraft_version = "26.4-snapshot-1"
 
 group = "org.embeddedt"
+version = "5.26.0+mc26.4-snapshot-1"
 
-val gitVersion = providers.of(GitVersionSource::class) {
-    parameters {
-        minecraftVersion.set(minecraft_version)
-        projectDir.set(rootProject.layout.projectDirectory)
-    }
-}
+base.archivesName = "modernfix-fabric"
 
-version = gitVersion.get()
-
-base.archivesName = "modernfix-neoforge"
-
-neoForge {
-    enable {
-        version = rootProject.properties["forge_version"].toString()
-        isDisableRecompilation = System.getenv("CI") == "true"
-    }
-
-    rootProject.properties["parchment_version"]?.let { parchmentVer ->
-        parchment {
-            minecraftVersion = rootProject.properties["parchment_mc_version"].toString()
-            mappingsVersion = parchmentVer.toString()
-        }
-    }
-
-    runs {
-        configureEach {
-            systemProperty("modernfix.auditMixinsAtStart", "true")
-        }
-        create("client") {
-            client()
-        }
-        create("server") {
-            server()
-        }
-        create("auditClient") {
-            client()
-            jvmArguments.addAll("-Dmodernfix.auditAndExit=true", "-Djava.awt.headless=true")
-        }
-    }
-
-    mods {
-        create("modernfix") {
-            sourceSet(sourceSets.main.get())
-        }
-    }
-}
-
-tasks.named<Jar>("jar") {
-    manifest.attributes(mapOf(
-        "Specification-Version" to "1",
-        "Implementation-Title" to project.name,
-        "Implementation-Version" to version
-    ))
+loom {
+    accessWidenerPath = file("src/main/resources/modernfix.accesswidener")
 }
 
 java {
@@ -69,32 +20,8 @@ java {
 }
 
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                // location of the maven that hosts JEI files
-                name = "Progwml6 maven"
-                url = uri("https://dvs1.progwml6.com/files/maven/")
-            }
-        }
-        forRepository {
-            maven {
-                name = "ModMaven"
-                url = uri("https://modmaven.dev")
-            }
-        }
-        filter {
-            includeGroup("mezz.jei")
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven("https://cursemaven.com")
-        }
-        filter {
-            includeGroup("curse.maven")
-        }
-    }
+    maven("https://maven.fabricmc.net/")
+    mavenCentral()
 }
 
 val embed by configurations.creating {
@@ -104,55 +31,26 @@ val embed by configurations.creating {
 }
 
 dependencies {
+    minecraft("com.mojang:minecraft:${minecraft_version}")
+    implementation("net.fabricmc:fabric-loader:0.18.5")
+    implementation("net.fabricmc.fabric-api:fabric-api:0.161.1+26.4")
+
     implementation(project(":annotations"))
     embed(project(":annotations"))
     annotationProcessor(project(path = ":annotation-processor", configuration = "shadow"))
-
-    val jei_version = rootProject.properties["jei_version"].toString()
-    val jei_minecraft_version = rootProject.properties["jei_minecraft_version"]?.toString() ?: minecraft_version
-    compileOnly("mezz.jei:jei-${jei_minecraft_version}-neoforge:${jei_version}")
-    compileOnly("curse.maven:spark-361579:${rootProject.properties["spark_version"].toString()}")
-    compileOnly("curse.maven:ctm-267602:${rootProject.properties["ctm_version"].toString()}")
-    compileOnly("curse.maven:ldlib-626676:${rootProject.properties["ldlib_version"].toString()}")
-    compileOnly("curse.maven:supermartijncore-454372:4455391")
-    compileOnly("curse.maven:cofhcore-69162:5374122")
-    compileOnly("curse.maven:resourcefullib-570073:5659871")
-    compileOnly("curse.maven:kubejs-238086:5853326")
-    compileOnly("curse.maven:terrablender-neoforge-940057:8046313")
 }
 
 tasks.named<Jar>("jar") {
     from(embed.map { if (it.isDirectory) it else zipTree(it) })
+    manifest.attributes(mapOf(
+        "Specification-Version" to "1",
+        "Implementation-Title" to project.name,
+        "Implementation-Version" to version
+    ))
 }
 
-val checkDanglingMixinPackageInfo by tasks.registering {
-    val mixinDir = file("src/main/java/org/embeddedt/modernfix/common/mixin")
-    inputs.dir(mixinDir)
-    doLast {
-        val dangling = mutableListOf<File>()
-        mixinDir.walkTopDown()
-            .filter { it.name == "package-info.java" }
-            .forEach { pkgInfo ->
-                val dir = pkgInfo.parentFile
-                val hasOtherJava = dir.listFiles { f -> f.name != "package-info.java" && f.extension == "java" }?.isNotEmpty() == true
-                val hasSubpackage = dir.listFiles { f -> f.isDirectory }?.isNotEmpty() == true
-                if (!hasOtherJava && !hasSubpackage) {
-                    dangling += pkgInfo
-                }
-            }
-        if (dangling.isNotEmpty()) {
-            throw GradleException(
-                "Dangling package-info.java files found (no sibling classes or subpackages):\n" +
-                dangling.joinToString("\n") { "  ${it.relativeTo(projectDir)}" }
-            )
-        }
-    }
-}
-
-// For the AP
 tasks.withType<JavaCompile>().configureEach {
     if (!name.lowercase().contains("test")) {
-        dependsOn(checkDanglingMixinPackageInfo)
         options.compilerArgs.addAll(
             listOf(
                 "-ArootProject.name=${rootProject.name}",
@@ -160,7 +58,6 @@ tasks.withType<JavaCompile>().configureEach {
             )
         )
     }
-    // Show more errors when porting
     options.compilerArgs.addAll(listOf("-Xmaxerrs", "1000"))
 }
 
@@ -174,56 +71,8 @@ sourceSets {
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(tasks.named("compileJava"))
-
     inputs.property("version", project.version)
-
-    filesMatching("META-INF/neoforge.mods.toml") {
+    filesMatching("fabric.mod.json") {
         expand("version" to project.version)
     }
-}
-
-val finalJarTask = "jar"
-
-tasks.register<Copy>("copyJarNameConsistent") {
-    from(tasks.named<Jar>(finalJarTask).get().outputs.files)
-    into(project.file("build/libs"))
-    rename { _ -> "modernfix-" + project.name + "-latest.jar" }
-}
-
-tasks.register<Copy>("copyJarToBin") {
-    from(tasks.named<Jar>(finalJarTask).get().outputs.files)
-    into(rootProject.file("bin"))
-    mustRunAfter(tasks.named("copyJarNameConsistent"))
-}
-
-tasks.named("build") {
-    dependsOn("copyJarToBin", "copyJarNameConsistent")
-}
-
-publishMods {
-    file.set(tasks.named<Jar>(finalJarTask).flatMap { it.archiveFile })
-    displayName.set(tasks.named<Jar>(finalJarTask).flatMap { it.archiveFileName })
-    changelog = "Please check the [GitHub wiki](https://github.com/embeddedt/ModernFix/wiki/Changelog) for major changes."
-    type = STABLE
-
-    modLoaders.add("neoforge")
-
-    curseforge {
-        projectId = "790626"
-        projectSlug = "modernfix"
-        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-        minecraftVersions.add(minecraft_version)
-        client = true
-        server = true
-    }
-    modrinth {
-        projectId = "nmDcB62a"
-        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-        minecraftVersions.add(minecraft_version)
-        environment = CLIENT_OR_SERVER_PREFERS_BOTH
-    }
-}
-
-tasks.named("publishMods") {
-    dependsOn(finalJarTask)
 }
